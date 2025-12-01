@@ -1,0 +1,19 @@
+{
+  "name": "letsur-marketplace",
+  "owner": "letsur",
+  "description": "Claude Marketplace 플러그인 모음",
+  "plugins": [
+    {
+      "name": "doc-export",
+      "source": "./plugins/doc-export",
+      "version": "1.0.0",
+      "description": "작업 산출물 자동 저장 (로컬-Obsidian/Notion)"
+    },
+    {
+      "name": "team-standards",
+      "source": "./plugins/team-standards",
+      "version": "1.0.0",
+      "description": "팀 표준 설정 및 컨벤션"
+    }
+  ]
+}

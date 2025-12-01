@@ -1,0 +1,247 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-12-01",
+  "agents": [
+    {
+      "name": "general-purpose",
+      "description": "범용 에이전트 - 복잡한 멀티스텝 작업 처리",
+      "author": "Anthropic",
+      "version": "built-in",
+      "tools": ["*"]
+    },
+    {
+      "name": "Explore",
+      "description": "코드베이스 탐색 전문 (Haiku 기반, 빠른 검색)",
+      "author": "Anthropic",
+      "version": "built-in",
+      "tools": ["Glob", "Grep", "Read", "Bash"]
+    },
+    {
+      "name": "Plan",
+      "description": "작업 계획 수립 및 코드베이스 분석",
+      "author": "Anthropic",
+      "version": "built-in",
+      "tools": ["Glob", "Grep", "Read", "Bash"]
+    },
+    {
+      "name": "code-reviewer",
+      "description": "코드 리뷰 및 품질 검사",
+      "author": "ai-kit",
+      "version": "1.0.0",
+      "path": "agents/code-reviewer"
+    },
+    {
+      "name": "doc-writer",
+      "description": "문서 자동 생성 (README, API docs)",
+      "author": "ai-kit",
+      "version": "1.0.0",
+      "path": "agents/doc-writer"
+    },
+    {
+      "name": "security-auditor",
+      "description": "보안 취약점 검사",
+      "author": "ai-kit",
+      "version": "1.0.0",
+      "path": "agents/security-auditor"
+    },
+    {
+      "name": "refactor-helper",
+      "description": "코드 리팩토링 제안",
+      "author": "ai-kit",
+      "version": "1.0.0",
+      "path": "agents/refactor-helper"
+    }
+  ],
+  "skills": [
+    {
+      "name": "git-commit",
+      "description": "커밋 메시지 자동 생성",
+      "author": "ai-kit",
+      "version": "1.0.0",
+      "path": "skills/git-commit"
+    },
+    {
+      "name": "test-generator",
+      "description": "테스트 코드 자동 생성",
+      "author": "ai-kit",
+      "version": "1.0.0",
+      "path": "skills/test-generator"
+    },
+    {
+      "name": "api-docs",
+      "description": "API 문서 자동 생성",
+      "author": "ai-kit",
+      "version": "1.0.0",
+      "path": "skills/api-docs"
+    },
+    {
+      "name": "error-explainer",
+      "description": "에러 메시지 분석 및 해결책 제시",
+      "author": "ai-kit",
+      "version": "1.0.0",
+      "path": "skills/error-explainer"
+    }
+  ],
+  "hooks": [
+    {
+      "name": "PreToolUse",
+      "description": "도구 호출 전 실행 (차단 가능)",
+      "author": "Anthropic",
+      "version": "built-in",
+      "type": "event",
+      "matcher": "도구명 패턴 (Write|Edit, Bash 등)",
+      "input": ["tool_name", "tool_input", "tool_use_id"],
+      "control": ["allow", "deny", "ask"]
+    },
+    {
+      "name": "PostToolUse",
+      "description": "도구 완료 직후 실행",
+      "author": "Anthropic",
+      "version": "built-in",
+      "type": "event",
+      "matcher": "도구명 패턴",
+      "input": ["tool_name", "tool_input", "tool_response"],
+      "control": ["feedback", "block"]
+    },
+    {
+      "name": "PermissionRequest",
+      "description": "권한 대화상자 표시 시",
+      "author": "Anthropic",
+      "version": "built-in",
+      "type": "event",
+      "matcher": "도구명 패턴",
+      "control": ["allow", "deny", "modify"]
+    },
+    {
+      "name": "UserPromptSubmit",
+      "description": "사용자 프롬프트 제출 시",
+      "author": "Anthropic",
+      "version": "built-in",
+      "type": "event",
+      "input": ["prompt"],
+      "control": ["block", "add_context"]
+    },
+    {
+      "name": "Stop",
+      "description": "에이전트 응답 완료 시",
+      "author": "Anthropic",
+      "version": "built-in",
+      "type": "event",
+      "input": ["stop_hook_active"],
+      "control": ["continue", "block"]
+    },
+    {
+      "name": "SubagentStop",
+      "description": "서브에이전트 작업 완료 시",
+      "author": "Anthropic",
+      "version": "built-in",
+      "type": "event",
+      "input": ["stop_hook_active"],
+      "control": ["continue", "block"]
+    },
+    {
+      "name": "SessionStart",
+      "description": "세션 시작/재개 시",
+      "author": "Anthropic",
+      "version": "built-in",
+      "type": "event",
+      "use": "환경변수 설정"
+    },
+    {
+      "name": "SessionEnd",
+      "description": "세션 종료 시",
+      "author": "Anthropic",
+      "version": "built-in",
+      "type": "event",
+      "use": "정리 작업"
+    },
+    {
+      "name": "PreCompact",
+      "description": "컨텍스트 압축 전",
+      "author": "Anthropic",
+      "version": "built-in",
+      "type": "event",
+      "use": "상태 저장"
+    },
+    {
+      "name": "Notification",
+      "description": "알림 발송 시",
+      "author": "Anthropic",
+      "version": "built-in",
+      "type": "event",
+      "matcher": "permission_prompt, idle_prompt 등",
+      "input": ["notification_type"]
+    },
+    {
+      "name": "doc-export",
+      "description": "세션 종료 시 문서 자동 저장",
+      "author": "ai-kit",
+      "version": "1.0.0",
+      "type": "custom",
+      "path": "hooks/doc-export",
+      "event": "Stop"
+    },
+    {
+      "name": "pre-commit-check",
+      "description": "커밋 전 코드 검증 (lint, format)",
+      "author": "ai-kit",
+      "version": "1.0.0",
+      "type": "custom",
+      "path": "hooks/pre-commit-check",
+      "event": "PreToolUse",
+      "matcher": "Bash"
+    },
+    {
+      "name": "auto-format",
+      "description": "파일 수정 후 자동 포맷팅",
+      "author": "ai-kit",
+      "version": "1.0.0",
+      "type": "custom",
+      "path": "hooks/auto-format",
+      "event": "PostToolUse",
+      "matcher": "Write|Edit"
+    },
+    {
+      "name": "sensitive-file-guard",
+      "description": "민감 파일 수정 차단 (.env, credentials)",
+      "author": "ai-kit",
+      "version": "1.0.0",
+      "type": "custom",
+      "path": "hooks/sensitive-file-guard",
+      "event": "PreToolUse",
+      "matcher": "Write|Edit"
+    },
+    {
+      "name": "command-logger",
+      "description": "실행된 명령어 로깅",
+      "author": "ai-kit",
+      "version": "1.0.0",
+      "type": "custom",
+      "path": "hooks/command-logger",
+      "event": "PostToolUse",
+      "matcher": "Bash"
+    },
+    {
+      "name": "session-summary",
+      "description": "세션 종료 시 작업 요약 생성",
+      "author": "ai-kit",
+      "version": "1.0.0",
+      "type": "custom",
+      "path": "hooks/session-summary",
+      "event": "SessionEnd"
+    }
+  ],
+  "tools": [
+    {"name": "Read", "description": "파일 읽기", "author": "Anthropic", "version": "built-in"},
+    {"name": "Write", "description": "파일 쓰기 (새 파일)", "author": "Anthropic", "version": "built-in"},
+    {"name": "Edit", "description": "파일 수정 (기존 파일)", "author": "Anthropic", "version": "built-in"},
+    {"name": "Bash", "description": "셸 명령 실행", "author": "Anthropic", "version": "built-in"},
+    {"name": "Glob", "description": "파일 패턴 검색", "author": "Anthropic", "version": "built-in"},
+    {"name": "Grep", "description": "파일 내용 검색", "author": "Anthropic", "version": "built-in"},
+    {"name": "Task", "description": "서브에이전트 실행", "author": "Anthropic", "version": "built-in"},
+    {"name": "TodoWrite", "description": "할일 목록 관리", "author": "Anthropic", "version": "built-in"},
+    {"name": "WebFetch", "description": "웹 콘텐츠 가져오기", "author": "Anthropic", "version": "built-in"},
+    {"name": "WebSearch", "description": "웹 검색", "author": "Anthropic", "version": "built-in"},
+    {"name": "NotebookEdit", "description": "Jupyter 노트북 편집", "author": "Anthropic", "version": "built-in"}
+  ]
+}

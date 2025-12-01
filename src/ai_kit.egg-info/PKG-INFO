@@ -1,0 +1,250 @@
+Metadata-Version: 2.4
+Name: ai-kit
+Version: 0.1.0
+Summary: Claude Code Marketplace CLI
+Author-email: dan1901 <dan1901@example.com>
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: setuptools
+Dynamic: license-file
+
+# AI Kit - Claude Code Marketplace
+
+팀 워크플로우 자동화를 위한 Claude Code 플러그인 마켓플레이스
+
+## 개요
+
+이 저장소는 Claude Code의 에이전트, 스킬, 훅을 관리하고 배포하는 팀 전용 마켓플레이스입니다.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  ai-kit list                                                │
+├─────────────────────────────────────────────────────────────┤
+│  📦 Agents                                                  │
+│    general-purpose      (built-in)   범용 에이전트          │
+│    code-reviewer        (ai-kit)     코드 리뷰              │
+│                                                             │
+│  ⚡ Skills                                                  │
+│    git-commit           (ai-kit)     커밋 메시지 생성       │
+│                                                             │
+│  🔗 Hooks                                                   │
+│    Stop                 (built-in)   [event]                │
+│    doc-export           (ai-kit)     문서 자동 저장         │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## 빠른 시작
+
+### 1. CLI 설치
+
+```bash
+# 저장소 클론
+git clone https://github.com/dan1901/ai-kit.git
+cd ai-kit
+
+# pip로 설치
+pip install .
+
+# 또는 uv로 설치 (권장)
+uv pip install .
+```
+
+### 2. 목록 확인
+
+```bash
+ai-kit list              # 전체 목록
+ai-kit list agents       # 에이전트만
+ai-kit list hooks        # 훅만
+```
+
+### 3. 설치
+
+```bash
+ai-kit install hooks doc-export
+ai-kit install skills git-commit
+```
+
+## CLI 명령어
+
+| 명령어 | 설명 |
+|--------|------|
+| `ai-kit list [type]` | 사용 가능한 항목 목록 |
+| `ai-kit install <type> <name>` | 항목 설치 |
+| `ai-kit remove <type> <name>` | 항목 제거 |
+| `ai-kit installed` | 설치된 항목 확인 |
+| `ai-kit info <type> <name>` | 상세 정보 |
+
+**Types**: `agents`, `skills`, `hooks`, `tools`
+
+## 포함된 항목
+
+### 에이전트 (Agents)
+
+| 이름 | 제작자 | 설명 |
+|------|--------|------|
+| `general-purpose` | Anthropic | 범용 에이전트 - 복잡한 멀티스텝 작업 |
+| `Explore` | Anthropic | 코드베이스 탐색 전문 (Haiku 기반) |
+| `Plan` | Anthropic | 작업 계획 수립 및 분석 |
+| `code-reviewer` | ai-kit | 코드 리뷰 및 품질 검사 |
+| `doc-writer` | ai-kit | 문서 자동 생성 |
+| `security-auditor` | ai-kit | 보안 취약점 검사 |
+| `refactor-helper` | ai-kit | 코드 리팩토링 제안 |
+
+### 스킬 (Skills)
+
+| 이름 | 설명 |
+|------|------|
+| `git-commit` | 커밋 메시지 자동 생성 |
+| `test-generator` | 테스트 코드 자동 생성 |
+| `api-docs` | API 문서 자동 생성 |
+| `error-explainer` | 에러 분석 및 해결책 제시 |
+
+### 훅 (Hooks)
+
+**내장 이벤트 (built-in)**
+
+| 이벤트 | 설명 |
+|--------|------|
+| `PreToolUse` | 도구 호출 전 (차단 가능) |
+| `PostToolUse` | 도구 완료 직후 |
+| `Stop` | 에이전트 응답 완료 시 |
+| `SessionStart` | 세션 시작 시 |
+| `SessionEnd` | 세션 종료 시 |
+
+**커스텀 훅 (ai-kit)**
+
+| 이름 | 이벤트 | 설명 |
+|------|--------|------|
+| `doc-export` | Stop | 세션 종료 시 문서 자동 저장 |
+| `auto-format` | PostToolUse | 파일 수정 후 자동 포맷팅 |
+| `sensitive-file-guard` | PreToolUse | 민감 파일 수정 차단 |
+| `command-logger` | PostToolUse | 실행된 명령어 로깅 |
+
+## 문서 저장 설정
+
+`doc-export` 훅을 설치한 후 저장 방식을 설정하세요.
+
+### 설정 파일 생성
+
+`.claude/doc-export.json`:
+
+```json
+{
+  "localPath": "./docs/outputs",
+  "extraExport": "none"
+}
+```
+
+### 저장 옵션
+
+| 옵션 | 설명 |
+|------|------|
+| `none` | 로컬 파일만 저장 (기본) |
+| `obsidian` | Obsidian Vault에도 저장 |
+| `notion` | Notion에도 저장 |
+
+### Obsidian 설정
+
+```json
+{
+  "localPath": "./docs/outputs",
+  "extraExport": "obsidian",
+  "obsidianVaultPath": "~/Documents/Obsidian/Work/Claude"
+}
+```
+
+### Notion 설정
+
+```json
+{
+  "localPath": "./docs/outputs",
+  "extraExport": "notion",
+  "notionApiKey": "secret_xxx",
+  "notionDatabaseId": "xxx-xxx-xxx"
+}
+```
+
+> **주의**: Notion API 키가 포함된 설정 파일은 `.gitignore`에 추가하세요.
+
+## 프로젝트에 적용
+
+### 1. 마켓플레이스 추가
+
+```bash
+# Claude Code 내에서
+/plugin marketplace add dan1901/ai-kit
+```
+
+### 2. 설정 파일 복사
+
+프로젝트에 `.claude/settings.json` 추가:
+
+```json
+{
+  "permissions": {
+    "deny": [
+      "bash:rm -rf",
+      "bash:sudo",
+      "write:.env*"
+    ]
+  },
+  "extraKnownMarketplaces": [
+    "dan1901/ai-kit"
+  ]
+}
+```
+
+## 디렉토리 구조
+
+```
+ai-kit/
+├── .claude-plugin/
+│   └── marketplace.json     # 플러그인 목록
+├── cli/
+│   └── ai-kit.sh            # CLI 도구
+├── commands/
+│   └── ai-kit.md            # /ai-kit 슬래시 명령
+├── plugins/
+│   └── doc-export/          # 문서 저장 플러그인
+├── registry/
+│   └── index.json           # 에이전트/스킬/훅 레지스트리
+├── .claude/
+│   └── settings.json        # 팀 권한 설정
+├── CLAUDE.md                # 프로젝트 메모리
+└── README.md
+```
+
+## 기여하기
+
+### 새 항목 추가
+
+1. `registry/index.json`에 항목 등록
+2. 필요한 파일 생성 (`.md`, `.sh` 등)
+3. PR 생성
+
+### 레지스트리 형식
+
+```json
+{
+  "name": "my-hook",
+  "description": "설명",
+  "author": "작성자",
+  "version": "1.0.0",
+  "type": "custom",
+  "path": "hooks/my-hook",
+  "event": "PostToolUse",
+  "matcher": "Write|Edit"
+}
+```
+
+## 라이선스
+
+MIT
+
+## 문의
+
+플러그인 관련 문의는 팀 채널로 연락하세요.

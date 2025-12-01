@@ -1,0 +1,17 @@
+# 민감 정보
+.claude/doc-export.json
+.env
+.env.*
+*.pem
+*.key
+credentials*.json
+
+# OS 파일
+.DS_Store
+Thumbs.db
+
+# 로컬 설정
+.claude/settings.local.json
+
+# 출력 디렉토리 (선택적)
+# docs/outputs/

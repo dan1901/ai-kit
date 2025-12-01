@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "type": "command",
+        "matcher": "",
+        "command": "${CLAUDE_PLUGIN_ROOT}/scripts/export-doc.sh"
+      }
+    ]
+  }
+}

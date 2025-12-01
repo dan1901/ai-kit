@@ -1,0 +1,2 @@
+[console_scripts]
+ai-kit = ai_kit.cli:main

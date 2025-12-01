@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "bash",
+      "read",
+      "write:./src/**",
+      "write:./tests/**",
+      "write:./docs/**"
+    ],
+    "deny": [
+      "bash:rm -rf",
+      "bash:sudo",
+      "write:.env*",
+      "write:**/credentials*",
+      "write:**/*.pem",
+      "write:**/*.key"
+    ]
+  },
+  "env": {
+    "TEAM_NAME": "ai-kit"
+  },
+  "extraKnownMarketplaces": [
+    "ai-kit/claude-marketplace"
+  ]
+}

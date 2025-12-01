@@ -1,0 +1,4 @@
+include registry/**/*
+include plugins/**/*
+recursive-include registry *
+recursive-include plugins *
