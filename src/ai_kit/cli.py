@@ -5,7 +5,7 @@ import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
-import pkg_resources
+
 
 # Colors for terminal output
 RED = '\033[0;31m'
@@ -177,12 +177,29 @@ def cmd_install(args, registry, root_dir):
             print(f"{YELLOW}Warning: Agent file not found. Registry entry only.{NC}")
             
     elif item_type == "skills":
-        (target_dir / "skills").mkdir(exist_ok=True)
-        src_file = registry_base / source_path / f"{name}.md"
-        if src_file.exists():
-            shutil.copy2(src_file, target_dir / "skills")
+        skills_dir = target_dir / "skills"
+        skills_dir.mkdir(exist_ok=True)
+        
+        src_path = registry_base / source_path
+        skill_md = src_path / f"{name}.md"
+        
+        if src_path.is_dir() and skill_md.exists():
+            # Multi-file skill (directory)
+            dest_dir = skills_dir / name
+            if dest_dir.exists():
+                shutil.rmtree(dest_dir)
+            shutil.copytree(src_path, dest_dir)
+            print(f"  Installed to {dest_dir}")
         else:
-            print(f"{YELLOW}Warning: Skill file not found. Registry entry only.{NC}")
+            # Single file skill (legacy or simple)
+            # Try to find the file directly if source_path points to a file
+            # or if it's inside a directory but we only want the file?
+            # Existing logic assumed: registry/path/name.md
+            src_file = src_path / f"{name}.md"
+            if src_file.exists():
+                shutil.copy2(src_file, skills_dir)
+            else:
+                print(f"{YELLOW}Warning: Skill file not found. Registry entry only.{NC}")
             
     elif item_type == "hooks":
         hooks_file = target_dir / "hooks.json"
@@ -282,7 +299,13 @@ def cmd_remove(args, root_dir):
     if item_type == "agents":
         (target_dir / "agents" / f"{name}.md").unlink(missing_ok=True)
     elif item_type == "skills":
-        (target_dir / "skills" / f"{name}.md").unlink(missing_ok=True)
+        skill_path = target_dir / "skills" / name
+        skill_md = target_dir / "skills" / f"{name}.md"
+        
+        if skill_path.is_dir():
+            shutil.rmtree(skill_path)
+        else:
+            skill_md.unlink(missing_ok=True)
     elif item_type == "hooks":
         hooks_file = target_dir / "hooks.json"
         if hooks_file.exists():

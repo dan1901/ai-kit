@@ -7,21 +7,33 @@
       "description": "범용 에이전트 - 복잡한 멀티스텝 작업 처리",
       "author": "Anthropic",
       "version": "built-in",
-      "tools": ["*"]
+      "tools": [
+        "*"
+      ]
     },
     {
       "name": "Explore",
       "description": "코드베이스 탐색 전문 (Haiku 기반, 빠른 검색)",
       "author": "Anthropic",
       "version": "built-in",
-      "tools": ["Glob", "Grep", "Read", "Bash"]
+      "tools": [
+        "Glob",
+        "Grep",
+        "Read",
+        "Bash"
+      ]
     },
     {
       "name": "Plan",
       "description": "작업 계획 수립 및 코드베이스 분석",
       "author": "Anthropic",
       "version": "built-in",
-      "tools": ["Glob", "Grep", "Read", "Bash"]
+      "tools": [
+        "Glob",
+        "Grep",
+        "Read",
+        "Bash"
+      ]
     },
     {
       "name": "code-reviewer",
@@ -80,6 +92,97 @@
       "author": "ai-kit",
       "version": "1.0.0",
       "path": "skills/error-explainer"
+    },
+    {
+      "name": "algorithmic-art",
+      "description": "Create generative art using p5.js",
+      "author": "Anthropic",
+      "version": "1.0.0",
+      "path": "skills/algorithmic-art"
+    },
+    {
+      "name": "brand-guidelines",
+      "description": "Apply Anthropic's official brand colors and typography",
+      "author": "Anthropic",
+      "version": "1.0.0",
+      "path": "skills/brand-guidelines"
+    },
+    {
+      "name": "canvas-design",
+      "description": "Design beautiful visual art in .png and .pdf formats",
+      "author": "Anthropic",
+      "version": "1.0.0",
+      "path": "skills/canvas-design"
+    },
+    {
+      "name": "document-skills",
+      "description": "Document processing and generation skills",
+      "author": "Anthropic",
+      "version": "1.0.0",
+      "path": "skills/document-skills"
+    },
+    {
+      "name": "frontend-design",
+      "description": "Frontend design patterns and components",
+      "author": "Anthropic",
+      "version": "1.0.0",
+      "path": "skills/frontend-design"
+    },
+    {
+      "name": "internal-comms",
+      "description": "Write internal communications like status reports",
+      "author": "Anthropic",
+      "version": "1.0.0",
+      "path": "skills/internal-comms"
+    },
+    {
+      "name": "mcp-builder",
+      "description": "Guide for creating high-quality MCP servers",
+      "author": "Anthropic",
+      "version": "1.0.0",
+      "path": "skills/mcp-builder"
+    },
+    {
+      "name": "skill-creator",
+      "description": "Guide for creating effective skills",
+      "author": "Anthropic",
+      "version": "1.0.0",
+      "path": "skills/skill-creator"
+    },
+    {
+      "name": "slack-gif-creator",
+      "description": "Create animated GIFs optimized for Slack",
+      "author": "Anthropic",
+      "version": "1.0.0",
+      "path": "skills/slack-gif-creator"
+    },
+    {
+      "name": "template-skill",
+      "description": "A basic template for new skills",
+      "author": "Anthropic",
+      "version": "1.0.0",
+      "path": "skills/template-skill"
+    },
+    {
+      "name": "theme-factory",
+      "description": "Style artifacts with pre-set themes",
+      "author": "Anthropic",
+      "version": "1.0.0",
+      "path": "skills/theme-factory"
+    },
+    {
+      "name": "web-artifacts-builder",
+      "description": "Build complex HTML artifacts using React and Tailwind",
+      "author": "Anthropic",
+      "version": "1.0.0",
+      "path": "skills/web-artifacts-builder"
+    },
+    {
+      "name": "webapp-testing",
+      "description": "Test local web applications using Playwright",
+      "author": "Anthropic",
+      "version": "1.0.0",
+      "path": "skills/webapp-testing"
     }
   ],
   "hooks": [
@@ -90,8 +193,16 @@
       "version": "built-in",
       "type": "event",
       "matcher": "도구명 패턴 (Write|Edit, Bash 등)",
-      "input": ["tool_name", "tool_input", "tool_use_id"],
-      "control": ["allow", "deny", "ask"]
+      "input": [
+        "tool_name",
+        "tool_input",
+        "tool_use_id"
+      ],
+      "control": [
+        "allow",
+        "deny",
+        "ask"
+      ]
     },
     {
       "name": "PostToolUse",
@@ -100,8 +211,15 @@
       "version": "built-in",
       "type": "event",
       "matcher": "도구명 패턴",
-      "input": ["tool_name", "tool_input", "tool_response"],
-      "control": ["feedback", "block"]
+      "input": [
+        "tool_name",
+        "tool_input",
+        "tool_response"
+      ],
+      "control": [
+        "feedback",
+        "block"
+      ]
     },
     {
       "name": "PermissionRequest",
@@ -110,7 +228,11 @@
       "version": "built-in",
       "type": "event",
       "matcher": "도구명 패턴",
-      "control": ["allow", "deny", "modify"]
+      "control": [
+        "allow",
+        "deny",
+        "modify"
+      ]
     },
     {
       "name": "UserPromptSubmit",
@@ -118,8 +240,13 @@
       "author": "Anthropic",
       "version": "built-in",
       "type": "event",
-      "input": ["prompt"],
-      "control": ["block", "add_context"]
+      "input": [
+        "prompt"
+      ],
+      "control": [
+        "block",
+        "add_context"
+      ]
     },
     {
       "name": "Stop",
@@ -127,8 +254,13 @@
       "author": "Anthropic",
       "version": "built-in",
       "type": "event",
-      "input": ["stop_hook_active"],
-      "control": ["continue", "block"]
+      "input": [
+        "stop_hook_active"
+      ],
+      "control": [
+        "continue",
+        "block"
+      ]
     },
     {
       "name": "SubagentStop",
@@ -136,8 +268,13 @@
       "author": "Anthropic",
       "version": "built-in",
       "type": "event",
-      "input": ["stop_hook_active"],
-      "control": ["continue", "block"]
+      "input": [
+        "stop_hook_active"
+      ],
+      "control": [
+        "continue",
+        "block"
+      ]
     },
     {
       "name": "SessionStart",
@@ -170,7 +307,9 @@
       "version": "built-in",
       "type": "event",
       "matcher": "permission_prompt, idle_prompt 등",
-      "input": ["notification_type"]
+      "input": [
+        "notification_type"
+      ]
     },
     {
       "name": "doc-export",
@@ -232,16 +371,71 @@
     }
   ],
   "tools": [
-    {"name": "Read", "description": "파일 읽기", "author": "Anthropic", "version": "built-in"},
-    {"name": "Write", "description": "파일 쓰기 (새 파일)", "author": "Anthropic", "version": "built-in"},
-    {"name": "Edit", "description": "파일 수정 (기존 파일)", "author": "Anthropic", "version": "built-in"},
-    {"name": "Bash", "description": "셸 명령 실행", "author": "Anthropic", "version": "built-in"},
-    {"name": "Glob", "description": "파일 패턴 검색", "author": "Anthropic", "version": "built-in"},
-    {"name": "Grep", "description": "파일 내용 검색", "author": "Anthropic", "version": "built-in"},
-    {"name": "Task", "description": "서브에이전트 실행", "author": "Anthropic", "version": "built-in"},
-    {"name": "TodoWrite", "description": "할일 목록 관리", "author": "Anthropic", "version": "built-in"},
-    {"name": "WebFetch", "description": "웹 콘텐츠 가져오기", "author": "Anthropic", "version": "built-in"},
-    {"name": "WebSearch", "description": "웹 검색", "author": "Anthropic", "version": "built-in"},
-    {"name": "NotebookEdit", "description": "Jupyter 노트북 편집", "author": "Anthropic", "version": "built-in"}
+    {
+      "name": "Read",
+      "description": "파일 읽기",
+      "author": "Anthropic",
+      "version": "built-in"
+    },
+    {
+      "name": "Write",
+      "description": "파일 쓰기 (새 파일)",
+      "author": "Anthropic",
+      "version": "built-in"
+    },
+    {
+      "name": "Edit",
+      "description": "파일 수정 (기존 파일)",
+      "author": "Anthropic",
+      "version": "built-in"
+    },
+    {
+      "name": "Bash",
+      "description": "셸 명령 실행",
+      "author": "Anthropic",
+      "version": "built-in"
+    },
+    {
+      "name": "Glob",
+      "description": "파일 패턴 검색",
+      "author": "Anthropic",
+      "version": "built-in"
+    },
+    {
+      "name": "Grep",
+      "description": "파일 내용 검색",
+      "author": "Anthropic",
+      "version": "built-in"
+    },
+    {
+      "name": "Task",
+      "description": "서브에이전트 실행",
+      "author": "Anthropic",
+      "version": "built-in"
+    },
+    {
+      "name": "TodoWrite",
+      "description": "할일 목록 관리",
+      "author": "Anthropic",
+      "version": "built-in"
+    },
+    {
+      "name": "WebFetch",
+      "description": "웹 콘텐츠 가져오기",
+      "author": "Anthropic",
+      "version": "built-in"
+    },
+    {
+      "name": "WebSearch",
+      "description": "웹 검색",
+      "author": "Anthropic",
+      "version": "built-in"
+    },
+    {
+      "name": "NotebookEdit",
+      "description": "Jupyter 노트북 편집",
+      "author": "Anthropic",
+      "version": "built-in"
+    }
   ]
 }
