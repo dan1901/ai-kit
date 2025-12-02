@@ -20,6 +20,80 @@ load_config() {
     fi
 }
 
+# 트랜스크립트에서 작업 내용 추출
+extract_work_summary() {
+    local transcript_path="$1"
+
+    # ~ 경로 확장
+    transcript_path="${transcript_path/#\~/$HOME}"
+
+    if [[ ! -f "$transcript_path" ]]; then
+        echo "(트랜스크립트를 찾을 수 없습니다)"
+        return
+    fi
+
+    # 사용자 요청 추출 (Human 메시지)
+    local user_requests=$(cat "$transcript_path" | jq -r '
+        select(.type == "human") |
+        .message.content // empty
+    ' 2>/dev/null | head -20)
+
+    # 수정된 파일 추출 (tool_use에서 Edit, Write 도구 사용)
+    local modified_files=$(cat "$transcript_path" | jq -r '
+        select(.type == "assistant") |
+        .message.content[]? |
+        select(.type == "tool_use") |
+        select(.name == "Edit" or .name == "Write") |
+        .input.file_path // empty
+    ' 2>/dev/null | sort -u)
+
+    # Bash 명령어 추출
+    local bash_commands=$(cat "$transcript_path" | jq -r '
+        select(.type == "assistant") |
+        .message.content[]? |
+        select(.type == "tool_use") |
+        select(.name == "Bash") |
+        .input.command // empty
+    ' 2>/dev/null | grep -E "^git (commit|push)|^npm |^yarn " | head -10)
+
+    # 결과 포맷
+    local summary=""
+
+    if [[ -n "$user_requests" ]]; then
+        summary+="### 사용자 요청\n"
+        echo "$user_requests" | while read -r line; do
+            if [[ -n "$line" ]]; then
+                # 첫 100자만 표시
+                summary+="- ${line:0:100}\n"
+            fi
+        done
+    fi
+
+    if [[ -n "$modified_files" ]]; then
+        summary+="\n### 수정된 파일\n"
+        echo "$modified_files" | while read -r file; do
+            if [[ -n "$file" ]]; then
+                summary+="- \`${file}\`\n"
+            fi
+        done
+    fi
+
+    if [[ -n "$bash_commands" ]]; then
+        summary+="\n### 실행된 명령어\n"
+        echo "$bash_commands" | while read -r cmd; do
+            if [[ -n "$cmd" ]]; then
+                summary+="- \`${cmd:0:80}\`\n"
+            fi
+        done
+    fi
+
+    if [[ -z "$summary" ]]; then
+        echo "(작업 내용 없음)"
+    else
+        echo -e "$summary"
+    fi
+}
+
 # 기본 파일 저장 (항상 실행)
 save_to_file() {
     local output_dir="$1"
@@ -134,16 +208,22 @@ main() {
 
     # 세션 정보 추출
     local session_id=$(echo "$hook_data" | jq -r '.session_id // "unknown"')
+    local transcript_path=$(echo "$hook_data" | jq -r '.transcript_path // empty')
     local timestamp=$(date +"%Y-%m-%d %H:%M:%S")
     local title="session_${session_id}"
+
+    # 작업 내용 추출
+    local work_summary=$(extract_work_summary "$transcript_path")
+
     local content="# 작업 세션 기록
 
 - 시간: ${timestamp}
 - 세션 ID: ${session_id}
+- 프로젝트: $(basename "$PROJECT_DIR")
 
 ## 작업 내용
 
-(세션 요약은 별도 구현 필요)"
+${work_summary}"
 
     # 1. 기본: 항상 파일로 저장
     save_to_file "$output_dir" "$content" "$title"
