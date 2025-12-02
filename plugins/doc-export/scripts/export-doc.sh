@@ -4,9 +4,12 @@
 
 set -e
 
+# 프로젝트 디렉토리 (환경변수 없으면 PWD 사용)
+PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+
 # 설정 파일 경로
-CONFIG_FILE="${CLAUDE_PROJECT_DIR}/.claude/doc-export.json"
-DEFAULT_OUTPUT_DIR="${CLAUDE_PROJECT_DIR}/docs/outputs"
+CONFIG_FILE="${PROJECT_DIR}/.claude/doc-export.json"
+DEFAULT_OUTPUT_DIR="${PROJECT_DIR}/docs/outputs"
 
 # 설정 로드
 load_config() {
@@ -43,13 +46,16 @@ save_to_obsidian() {
         vault_path="$HOME/Documents/Obsidian Vault"
     fi
 
+    # ~ 경로 확장
+    vault_path="${vault_path/#\~/$HOME}"
+
     if [[ ! -d "$vault_path" ]]; then
         echo "⚠️ Obsidian Vault 경로가 존재하지 않습니다: $vault_path"
         return 1
     fi
 
     # 프로젝트명으로 폴더 생성 (Vault 내 프로젝트 폴더)
-    local project_name=$(basename "${CLAUDE_PROJECT_DIR:-$(pwd)}")
+    local project_name=$(basename "${PROJECT_DIR}")
     local project_folder="${vault_path}/${project_name}"
     mkdir -p "$project_folder"
 
