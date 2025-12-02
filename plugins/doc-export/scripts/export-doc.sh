@@ -38,15 +38,19 @@ save_to_obsidian() {
     local timestamp=$(date +"%Y%m%d_%H%M%S")
     local filename="${timestamp}_${title}.md"
 
+    # 기본 Obsidian Vault 경로 (설정 없으면 기본값 사용)
     if [[ -z "$vault_path" ]]; then
-        echo "⚠️ Obsidian Vault 경로가 설정되지 않았습니다."
-        return 1
+        vault_path="$HOME/Documents/Obsidian Vault"
     fi
 
     if [[ ! -d "$vault_path" ]]; then
         echo "⚠️ Obsidian Vault 경로가 존재하지 않습니다: $vault_path"
         return 1
     fi
+
+    # Claude 보관함 경로 (Vault 내 Claude 폴더)
+    local claude_folder="${vault_path}/Claude"
+    mkdir -p "$claude_folder"
 
     # Obsidian용 메타데이터 추가
     local obsidian_content="---
@@ -56,8 +60,8 @@ tags: [claude, session]
 
 ${content}"
 
-    echo -e "$obsidian_content" > "${vault_path}/${filename}"
-    echo "🗃️ Obsidian 저장 완료: ${vault_path}/${filename}"
+    echo -e "$obsidian_content" > "${claude_folder}/${filename}"
+    echo "🗃️ Obsidian 저장 완료: ${claude_folder}/${filename}"
 }
 
 # Notion 저장
