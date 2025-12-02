@@ -1,0 +1,18 @@
+{
+  "name": "test-generator",
+  "version": "1.0.0",
+  "author": {
+    "name": "ai-kit"
+  },
+  "description": "테스트 코드 자동 생성 플러그인",
+  "repository": "https://github.com/dan1901/ai-kit",
+  "license": "MIT",
+  "keywords": [
+    "test",
+    "testing",
+    "unittest",
+    "jest",
+    "pytest",
+    "vitest"
+  ]
+}

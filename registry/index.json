@@ -77,7 +77,7 @@
       "description": "테스트 코드 자동 생성",
       "author": "ai-kit",
       "version": "1.0.0",
-      "path": "skills/test-generator"
+      "path": "plugins/test-generator"
     },
     {
       "name": "api-docs",
