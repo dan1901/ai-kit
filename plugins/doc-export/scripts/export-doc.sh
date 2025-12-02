@@ -48,9 +48,10 @@ save_to_obsidian() {
         return 1
     fi
 
-    # Claude 보관함 경로 (Vault 내 Claude 폴더)
-    local claude_folder="${vault_path}/Claude"
-    mkdir -p "$claude_folder"
+    # 프로젝트명으로 폴더 생성 (Vault 내 프로젝트 폴더)
+    local project_name=$(basename "${CLAUDE_PROJECT_DIR:-$(pwd)}")
+    local project_folder="${vault_path}/${project_name}"
+    mkdir -p "$project_folder"
 
     # Obsidian용 메타데이터 추가
     local obsidian_content="---
@@ -60,8 +61,8 @@ tags: [claude, session]
 
 ${content}"
 
-    echo -e "$obsidian_content" > "${claude_folder}/${filename}"
-    echo "🗃️ Obsidian 저장 완료: ${claude_folder}/${filename}"
+    echo -e "$obsidian_content" > "${project_folder}/${filename}"
+    echo "🗃️ Obsidian 저장 완료: ${project_folder}/${filename}"
 }
 
 # Notion 저장
