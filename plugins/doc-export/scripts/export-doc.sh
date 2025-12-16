@@ -20,6 +20,37 @@ load_config() {
     fi
 }
 
+# 대화 맥락 추출 (사용자 요청 + 에이전트 응답 쌍)
+extract_conversation_context() {
+    local transcript_path="$1"
+    local max_items="${2:-5}"
+
+    transcript_path="${transcript_path/#\~/$HOME}"
+
+    [[ ! -f "$transcript_path" ]] && return
+
+    # 타임스탬프순 정렬 후 user-assistant 쌍 추출
+    cat "$transcript_path" | jq -rs --argjson max "$max_items" '
+        sort_by(.timestamp) |
+        reduce range(length) as $i ({items: ., pairs: [], last_user: null};
+            if .items[$i].type == "user" and (.items[$i].message.content | type) == "string"
+            then .last_user = (.items[$i].message.content[0:150] | gsub("\n"; " "))
+            elif .items[$i].type == "assistant" and .last_user != null
+            then (
+                [.items[$i].message.content[]? | select(.type == "text") | .text[0:300]] | first // ""
+            ) as $resp |
+            if $resp != ""
+            then .pairs += [{user: .last_user, assistant: ($resp | split("\n")[0] | .[0:200])}] | .last_user = null
+            else .
+            end
+            else .
+            end
+        ) |
+        .pairs[:$max][] |
+        "**요청**: \(.user)\n**응답**: \(.assistant)"
+    ' 2>/dev/null
+}
+
 # 트랜스크립트에서 작업 내용 추출
 extract_work_summary() {
     local transcript_path="$1"
@@ -32,13 +63,15 @@ extract_work_summary() {
         return
     fi
 
-    # 사용자 요청 추출 (Human 메시지)
-    local user_requests=$(cat "$transcript_path" | jq -r '
-        select(.type == "human") |
-        .message.content // empty
-    ' 2>/dev/null | head -20)
+    local summary=""
 
-    # 수정된 파일 추출 (tool_use에서 Edit, Write 도구 사용)
+    # 1. 대화 맥락 (요청-응답 쌍)
+    local context=$(extract_conversation_context "$transcript_path" 5)
+    if [[ -n "$context" ]]; then
+        summary+="### 대화 요약\n\n${context}\n"
+    fi
+
+    # 2. 수정된 파일 추출 (tool_use에서 Edit, Write 도구 사용)
     local modified_files=$(cat "$transcript_path" | jq -r '
         select(.type == "assistant") |
         .message.content[]? |
@@ -47,44 +80,27 @@ extract_work_summary() {
         .input.file_path // empty
     ' 2>/dev/null | sort -u)
 
-    # Bash 명령어 추출
+    if [[ -n "$modified_files" ]]; then
+        summary+="\n### 수정된 파일\n"
+        while read -r file; do
+            [[ -n "$file" ]] && summary+="- \`${file}\`\n"
+        done <<< "$modified_files"
+    fi
+
+    # 3. 실행된 주요 명령어
     local bash_commands=$(cat "$transcript_path" | jq -r '
         select(.type == "assistant") |
         .message.content[]? |
         select(.type == "tool_use") |
         select(.name == "Bash") |
         .input.command // empty
-    ' 2>/dev/null | grep -E "^git (commit|push)|^npm |^yarn " | head -10)
-
-    # 결과 포맷
-    local summary=""
-
-    if [[ -n "$user_requests" ]]; then
-        summary+="### 사용자 요청\n"
-        echo "$user_requests" | while read -r line; do
-            if [[ -n "$line" ]]; then
-                # 첫 100자만 표시
-                summary+="- ${line:0:100}\n"
-            fi
-        done
-    fi
-
-    if [[ -n "$modified_files" ]]; then
-        summary+="\n### 수정된 파일\n"
-        echo "$modified_files" | while read -r file; do
-            if [[ -n "$file" ]]; then
-                summary+="- \`${file}\`\n"
-            fi
-        done
-    fi
+    ' 2>/dev/null | grep -E "^git (commit|push)|^npm |^yarn " | head -5)
 
     if [[ -n "$bash_commands" ]]; then
         summary+="\n### 실행된 명령어\n"
-        echo "$bash_commands" | while read -r cmd; do
-            if [[ -n "$cmd" ]]; then
-                summary+="- \`${cmd:0:80}\`\n"
-            fi
-        done
+        while read -r cmd; do
+            [[ -n "$cmd" ]] && summary+="- \`${cmd:0:80}\`\n"
+        done <<< "$bash_commands"
     fi
 
     if [[ -z "$summary" ]]; then
